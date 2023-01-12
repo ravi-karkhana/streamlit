@@ -16,3 +16,8 @@ def feture_ectration_fun(file_name):
     features[file_name.name.split(".")[0]] = set(feature) # taking only unique fetures
 
     return features
+
+
+def get_machined_vol(l,b,h,vol):
+    machine_vol = l*b*h - vol
+    return machine_vol

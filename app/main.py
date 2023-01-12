@@ -4,11 +4,33 @@ import fe_fun
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
 # cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
-uploaded_file = st.file_uploader("Choose a file", type=["clt"])
+with st.form(key='columns_in_form'):
+    c1, c2, c3, c4,c5 = st.columns(5)
+    with c1:
+        length = st.number_input("Length in mm")
+    with c2:
+        width = st.number_input("Width in mm")
+    with c3:
+        height = st.number_input("Height in mm")
+    with c4:
+        volume = st.number_input("Part Volume in mm^3")
+    with c5:
+        surface_area = st.number_input("Surface Area in mm^2")
+
+    uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
+
+    submitButton = st.form_submit_button(label = 'Calculate')
+
+# uploaded_file = st.file_uploader("Choose a file", type=["clt"])
 
 if uploaded_file is not None:
+    mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
     output = fe_fun.feture_ectration_fun(uploaded_file)
-    st.write(output)
+    name = str(uploaded_file.name).split(".")[0]
+    data = [length,width,height,volume,surface_area,mchn_vol,output[name]]
+    st.write(data)
+
+st.snow()
 
 # if cad_file is not None:
 #     cad_opt = cad_fe.cad_fe()
