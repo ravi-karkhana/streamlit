@@ -1,9 +1,10 @@
 import streamlit as st
 import fe_fun
+import trimesh
+import os
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
-# cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
 with st.form(key='columns_in_form'):
     c1, c2, c3, c4,c5 = st.columns(5)
     with c1:
@@ -19,9 +20,9 @@ with st.form(key='columns_in_form'):
 
     uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
 
-    submitButton = st.form_submit_button(label = 'Calculate')
+    # cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
 
-# uploaded_file = st.file_uploader("Choose a file", type=["clt"])
+    submitButton = st.form_submit_button(label = 'Calculate')
 
 if uploaded_file is not None:
     mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
@@ -33,5 +34,9 @@ if uploaded_file is not None:
 st.snow()
 
 # if cad_file is not None:
-#     cad_opt = cad_fe.cad_fe()
-#     st.write("done")
+#     with open(cad_file.name,"wb") as f:
+#         f.write(cad_file.getvalue())
+#     filepath = os.getcwd()+cad_file.name
+#     cad = trimesh.Trimesh(**trimesh.interfaces.gmsh.load_gmsh(file_name=filepath))
+#     valu =cad.volume
+#     st.write("done",valu)
