@@ -4,6 +4,9 @@ import trimesh
 import os
 import sheet_metal_fe
 import sheet_metal_bc
+import pickle
+import pandas as pd
+import numpy as np
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
@@ -11,30 +14,50 @@ tab1, tab2 = st.tabs(["CNC","sheet metal"])
 
 with tab1:
     with st.form(key='columns_in_form'):
-        c1, c2, c3, c4,c5 = st.columns(5)
+        c1, c2 = st.columns(2)
         with c1:
-            length = st.number_input("Length in mm")
+            volume = st.number_input("Part Volume in mm^3",0)
+            uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
         with c2:
-            width = st.number_input("Width in mm")
-        with c3:
-            height = st.number_input("Height in mm")
-        with c4:
-            volume = st.number_input("Part Volume in mm^3")
-        with c5:
-            surface_area = st.number_input("Surface Area in mm^2")
-
-        uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
+            surface_area = st.number_input("Surface Area in mm^2",0)
+            pdf_file = st.file_uploader("Choose a Solidwork Mass Property File", type=["pdf"])
 
         # cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
 
         submitButton = st.form_submit_button(label = 'Calculate')
 
+    pickled_gs_cv_rndm_model = pickle.load(open('gs_cv_rndm.pkl', 'rb'))
+
+    x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
+
     if uploaded_file is not None:
+        output = fe_fun.feture_extration_fun(uploaded_file)
+        lbh_data = fe_fun.get_lbh_from_file(uploaded_file)
+        length = lbh_data["Length"]
+        width = lbh_data["Width"]
+        height = lbh_data["Height"]
+
         mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
-        output = fe_fun.feture_ectration_fun(uploaded_file)
-        name = str(uploaded_file.name).split(".")[0]
-        data = [length,width,height,volume,surface_area,mchn_vol,output[name]]
-        st.write(data)
+        final_feat_list = fe_fun.feature_list_for_ml(fe_fun.ref_feat,output)
+
+        final_feat_list[uploaded_file.name.split(".")[0]]["Length"] = length
+        final_feat_list[uploaded_file.name.split(".")[0]]["Width"] = width
+        final_feat_list[uploaded_file.name.split(".")[0]]["Height"] = height
+
+        if pdf_file is not None:
+            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = surface_area
+            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = volume
+        else:
+            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = surface_area
+            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = volume
+
+        final_feat_list[uploaded_file.name.split(".")[0]]["Machined volume"] = mchn_vol
+    
+        df = pd.DataFrame(final_feat_list)
+        test_data = df.values
+        test_data = [list(np.concatenate(test_data))]
+        y = pickled_gs_cv_rndm_model.predict(test_data)
+        st.write(y,df)
 
     st.snow()
 
