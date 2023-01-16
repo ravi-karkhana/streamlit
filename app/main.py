@@ -83,7 +83,7 @@ with tab2:
 
     if "visibility" not in st.session_state:
             st.session_state.visibility = "visible"
-            st.session_state.disabled = False
+            st.session_state.disabled = True
 
     st.checkbox("Edit Database", key="disabled")
 
