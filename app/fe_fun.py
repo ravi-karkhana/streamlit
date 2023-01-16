@@ -70,7 +70,10 @@ def feature_list_for_ml(ref_feat,extract_cad_feat):
     for item,val in extract_cad_feat.items():
         temp_fet_val = ref_feat.copy()
         for i in extract_cad_feat[item]:
-            temp_fet_val[i] = 1
+            try:
+                temp_fet_val[i] = 1
+            except:
+                pass
         actual_fetaure_list[item] = temp_fet_val
     return actual_fetaure_list
 
