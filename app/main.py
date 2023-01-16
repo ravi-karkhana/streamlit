@@ -17,6 +17,7 @@ with tab1:
         c1, c2 = st.columns(2)
         with c1:
             volume = st.number_input("Part Volume in mm^3",0)
+            qty = st.number_input("Total Quantity",1)
             uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
         with c2:
             surface_area = st.number_input("Surface Area in mm^2",0)
@@ -27,8 +28,9 @@ with tab1:
         submitButton = st.form_submit_button(label = 'Calculate')
 
     pickled_gs_cv_rndm_model = pickle.load(open('gs_cv_rndm.pkl', 'rb'))
+    pickled_gs_cv_rndm_setup_cost_model = pickle.load(open('gs_cv_rndm_setup_cost.pkl', 'rb'))
 
-    x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
+    # x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
 
     if uploaded_file is not None:
         output = fe_fun.feture_extration_fun(uploaded_file)
@@ -44,20 +46,23 @@ with tab1:
         final_feat_list[uploaded_file.name.split(".")[0]]["Width"] = width
         final_feat_list[uploaded_file.name.split(".")[0]]["Height"] = height
 
-        if pdf_file is not None:
+        if pdf_file is None:
             final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = surface_area
             final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = volume
         else:
-            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = surface_area
-            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = volume
+            basic_prop = fe_fun.get_besic_prop(pdf_file)
+            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = basic_prop["Surface area"]
+            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = basic_prop["Volume"]
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Machined volume"] = mchn_vol
     
         df = pd.DataFrame(final_feat_list)
         test_data = df.values
         test_data = [list(np.concatenate(test_data))]
-        y = pickled_gs_cv_rndm_model.predict(test_data)
-        st.write(y,df)
+        machine_cost = pickled_gs_cv_rndm_model.predict(test_data)
+        setup_cost = pickled_gs_cv_rndm_setup_cost_model.predict(test_data)
+        total_Mfg_cost_per_part = machine_cost + setup_cost/qty
+        st.write(total_Mfg_cost_per_part,df)
 
     st.snow()
 
