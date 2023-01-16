@@ -83,7 +83,7 @@ with tab2:
 
     if "visibility" not in st.session_state:
             st.session_state.visibility = "visible"
-            st.session_state.disabled = True
+            st.session_state.disabled = False
 
     st.checkbox("Edit Database", key="disabled")
 
@@ -94,14 +94,19 @@ with tab2:
         fright_percent = st.slider("fright Percentage in %",0,40,10,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
     with c2:
-        c_mf = st.number_input("cutting factor",0.012)
-        mf_bend = st.number_input("Bend Factor",10)
+        c_mf = st.number_input("cutting factor",0.012,label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,)
+        mf_bend = st.number_input("Bend Factor",10,label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,)
     with c3:
-        density = st.number_input("Density in gm/cc",8.0)
+        density = st.number_input("Density in gm/cc",8.0,label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,)
     with c4:
-        pp_rate = st.number_input("Post Process rate",0.014)
+        pp_rate = st.number_input("Post Process rate",0.014,label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,)
     with c5:
-        ns_mf = st.number_input("no of start factor",1.0)
+        ns_mf = st.number_input("no of start factor",1.0,label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,)
 
     with st.form(key='sheet metal file'):
 
