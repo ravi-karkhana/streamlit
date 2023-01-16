@@ -107,9 +107,9 @@ with tab2:
         c1, c2, c3, c4,c5 = st.columns(5)
         with c1:
             rejection_percent = st.slider("Rejection Percentage in %",0,10,3,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+            disabled=st.session_state.disabled,)
             fright_percent = st.slider("fright Percentage in %",0,40,10,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+            disabled=st.session_state.disabled,)
         with c2:
             c_mf = st.number_input("cutting factor",0.012)
             mf_bend = st.number_input("Bend Factor",10)
