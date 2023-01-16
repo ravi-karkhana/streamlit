@@ -125,7 +125,7 @@ with tab2:
         submitButton = st.form_submit_button(label = 'Calculate')
 
     if dxf_file is not None:
-        with open("dxf_file//"+dxf_file.name,"wb") as f:
+        with open(Path(__file__).parents[0] /"dxf_file"/ dxf_file.name,"wb") as f:
             f.write(dxf_file.getvalue())
         filepath = Path(__file__).parents[0] /"dxf_file"/ dxf_file.name
         st.write(filepath)
