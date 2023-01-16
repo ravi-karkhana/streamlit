@@ -125,6 +125,7 @@ with tab2:
         with open(dxf_file.name,"wb") as f:
             f.write(dxf_file.getvalue())
         filepath = Path(__file__).parents[0] / dxf_file.name
+        st.write(filepath)
         # filepath = os.getcwd()+"\\"+dxf_file.name
         # s_perimeter = sheet_metal_fe.get_dxf_perimeter(filepath)
         cal_data = {
