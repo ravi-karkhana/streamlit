@@ -27,8 +27,8 @@ with tab1:
 
         submitButton = st.form_submit_button(label = 'Calculate')
 
-    pickled_gs_cv_rndm_model = pickle.load(open('gs_cv_rndm.pkl', 'rb'))
-    pickled_gs_cv_rndm_setup_cost_model = pickle.load(open('gs_cv_rndm_setup_cost.pkl', 'rb'))
+    pickled_gs_cv_rndm_model = pickle.load(open(os.getcwd()+"\\"+"gs_cv_rndm.pkl", 'rb'))
+    pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(os.getcwd()+"\\"+'gs_cv_rndm_setup_cost.pkl', 'rb'))
 
     # x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
 
@@ -38,6 +38,7 @@ with tab1:
         length = lbh_data["Length"]
         width = lbh_data["Width"]
         height = lbh_data["Height"]
+        print(os.getcwd()+"\\"+"gs_cv_rndm.pkl")
 
         mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
         final_feat_list = fe_fun.feature_list_for_ml(fe_fun.ref_feat,output)
