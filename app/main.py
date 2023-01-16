@@ -7,6 +7,7 @@ import sheet_metal_bc
 import pickle
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
@@ -27,8 +28,11 @@ with tab1:
 
         submitButton = st.form_submit_button(label = 'Calculate')
 
-    pickled_gs_cv_rndm_model = pickle.load(open(os.getcwd()+"\\"+"gs_cv_rndm.pkl", 'rb'))
-    pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(os.getcwd()+"\\"+'gs_cv_rndm_setup_cost.pkl', 'rb'))
+    machine_model_file = Path(__file__).parents[1] / "app\gs_cv_rndm.pkl"
+    setupcost_model_file = Path(__file__).parents[1] / "app\gs_cv_rndm_setup_cost.pkl"
+    pickled_gs_cv_rndm_model = pickle.load(open(machine_model_file, 'rb'))
+    pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(setupcost_model_file, 'rb'))
+    
 
     # x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
 
@@ -65,7 +69,7 @@ with tab1:
         total_Mfg_cost_per_part = machine_cost + setup_cost/qty
         st.write(total_Mfg_cost_per_part,df)
 
-    st.snow()
+    # st.snow()
 
     # if cad_file is not None:
     #     with open(cad_file.name,"wb") as f:
