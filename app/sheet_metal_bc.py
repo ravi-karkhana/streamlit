@@ -160,14 +160,14 @@ class Sheetmetal_buildCosting_cal:
         sheet_data["blank_size"] = blank_size
         sheet_data["nest_blank_size"] = sheet_nest_data[2]
         sheet_data["no_of_sheet"] = sheet_nest_data[0]
-        sheet_data["sheet_nest_data"] = sheet_nest_data
+        # sheet_data["sheet_nest_data"] = sheet_nest_data
         sheet_data["area"] = area
-        sheet_data["volum"] = volum
+        sheet_data["volume"] = volum
         sheet_data["wt"] = wt
         sheet_data["nos"] = sheet_nest_data[1]
         sheet_data["wt_per_part"] = wt_per_part
         sheet_data["rm_cost"] = rm_cost
-        sheet_data["l_cut_cost"] = l_cut_cost
+        sheet_data["lasser_cutting_cost"] = l_cut_cost
         sheet_data["rm_cutting_cost"] = rm_cutting_cost
         sheet_data["rm_fright_cost"] = rm_fright_cost
         sheet_data["rejection_cost"] = rejection_cost
@@ -175,10 +175,10 @@ class Sheetmetal_buildCosting_cal:
         sheet_data["post_processing_cost"] = post_processing_cost
         sheet_data["total_cost_per_part"] = total_cost_per_part
         sheet_data["total_cost"] = total_cost
-        sheet_data["opt_nos"] = sheet_nest_data[4]
-        sheet_data["opt_rm_cost"] = opt_rm_cost
-        sheet_data["opt_total_cost_per_part"] = opt_total_cost_per_part
-        sheet_data["opt_total_cost"] = opt_total_cost
+        sheet_data["optimum_nos"] = sheet_nest_data[4]
+        sheet_data["optimum_rm_cost"] = opt_rm_cost
+        sheet_data["optimum_total_cost_per_part"] = opt_total_cost_per_part
+        sheet_data["optimum_total_cost"] = opt_total_cost
         return sheet_data
 
 

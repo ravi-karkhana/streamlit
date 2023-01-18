@@ -1,6 +1,5 @@
 import streamlit as st
 import fe_fun
-import trimesh
 import os
 import sheet_metal_fe
 import sheet_metal_bc
@@ -8,6 +7,7 @@ import pickle
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
@@ -42,7 +42,7 @@ with tab1:
         length = lbh_data["Length"]
         width = lbh_data["Width"]
         height = lbh_data["Height"]
-        print(os.getcwd()+"\\"+"gs_cv_rndm.pkl")
+        # print(os.getcwd()+"\\"+"gs_cv_rndm.pkl")
 
         mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
         final_feat_list = fe_fun.feature_list_for_ml(fe_fun.ref_feat,output)
@@ -110,7 +110,8 @@ with tab2:
 
     with st.form(key='sheet metal file'):
 
-        dxf_file = st.file_uploader("Choose a dxf File", type=["dxf"])
+        # st.info('Please Upload a flat Pattern 1:1 DXf file ', icon="ℹ️")
+        dxf_file = st.file_uploader("Choose a flat Pattern 1:1 DXf file", type=["dxf"])
 
         c1, c2, c3, c4,c5 = st.columns(5)
         with c1:
@@ -133,7 +134,7 @@ with tab2:
         with open(Path(__file__).parents[0] /"dxf_file"/ dxf_file.name,"wb") as f:
             f.write(dxf_file.getvalue())
         filepath = Path(__file__).parents[0] /"dxf_file"/ dxf_file.name
-        st.write(filepath)
+        # st.write(filepath)
         # filepath = os.getcwd()+"\\"+dxf_file.name
         # s_perimeter = sheet_metal_fe.get_dxf_perimeter(filepath)
         cal_data = {
@@ -145,8 +146,8 @@ with tab2:
         "c_mf": c_mf,  # cutting factor, db
         "ns_mf": float(ns_mf),  # no of start factor, db
         "rm_rate": rm_rate,  # rate card, db
-        "fright_percent": float(fright_percent),  # db
-        "rejection_percent": float(rejection_percent), # db
+        "fright_percent": float(fright_percent)/100.0,  # db
+        "rejection_percent": float(rejection_percent)/100.0, # db
         "mf_bend": mf_bend,  # db
         "thk": thk,  # user input
         "nos": nos,  # qty , user input
@@ -156,7 +157,12 @@ with tab2:
         "color": color,  # user input
         "pp_rate" :pp_rate # rate per squre inch, db
     }
-
+        # html_parse = sheet_metal_fe.get_html(filepath)
+        # plt.figure()
+        # plt.axis('equal')
+        # html_parse.plot(autozoom=True)
+        # st.pyplot(plt)
+        # print(html_parse)
         a = sheet_metal_bc.Sheetmetal_buildCosting_cal().sheet_maetal_cost(cal_data)
         os.remove(filepath)
         st.write(a)

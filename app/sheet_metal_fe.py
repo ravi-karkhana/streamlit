@@ -1,7 +1,8 @@
 import ezdxf
 import math
 import numpy as np
-import pandas as pd
+import svgwrite
+import io
 
 def get_dxf_perimeter(path) :   
     dwg = ezdxf.readfile(path)
@@ -158,3 +159,10 @@ def get_blank_size(path):
     width = round(measure(y_min,y_max),3)
     return length, width
 
+# def get_html(path):
+#     # dwg = CQ(import_dxf(path))
+#     dwg = ezdxf.readfile(path)
+#     # svg_drawing = dwg.to_svg()
+#     # html = dwg.to_html()
+#     # html = svg_drawing.getvalue()
+#     return dwg
