@@ -1,8 +1,6 @@
 import ezdxf
 import math
 import numpy as np
-import svgwrite
-import io
 
 def get_dxf_perimeter(path) :   
     dwg = ezdxf.readfile(path)

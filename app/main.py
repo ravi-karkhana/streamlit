@@ -7,7 +7,6 @@ import pickle
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
