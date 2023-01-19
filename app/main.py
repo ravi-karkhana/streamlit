@@ -136,34 +136,38 @@ with tab2:
         # st.write(filepath)
         # filepath = os.getcwd()+"\\"+dxf_file.name
         # s_perimeter = sheet_metal_fe.get_dxf_perimeter(filepath)
-        cal_data = {
-        "perimeter":sheet_metal_fe.get_dxf_perimeter(filepath),
-        "no_of_start":sheet_metal_fe.get_no_of_start(filepath),
-        "box_size":sheet_metal_fe.get_blank_size(filepath),
-        "sheet_size": (1250,2500),
-        "density": float(density),  # in gm/cc,db
-        "c_mf": c_mf,  # cutting factor, db
-        "ns_mf": float(ns_mf),  # no of start factor, db
-        "rm_rate": rm_rate,  # rate card, db
-        "fright_percent": float(fright_percent)/100.0,  # db
-        "rejection_percent": float(rejection_percent)/100.0, # db
-        "mf_bend": mf_bend,  # db
-        "thk": thk,  # user input
-        "nos": nos,  # qty , user input
-        "no_of_bend" : no_of_bend,   # user input
-        "sub_process":sub_process ,  # user input
-        "surface_finish": surface_finish,  # user input
-        "color": color,  # user input
-        "pp_rate" :pp_rate # rate per squre inch, db
-    }
-        # html_parse = sheet_metal_fe.get_html(filepath)
-        # plt.figure()
-        # plt.axis('equal')
-        # html_parse.plot(autozoom=True)
-        # st.pyplot(plt)
-        # print(html_parse)
-        a = sheet_metal_bc.Sheetmetal_buildCosting_cal().sheet_maetal_cost(cal_data)
-        os.remove(filepath)
-        st.write(a)
+        try :
+            cal_data = {
+            "perimeter":sheet_metal_fe.get_dxf_perimeter(filepath),
+            "no_of_start":sheet_metal_fe.get_no_of_start(filepath),
+            "box_size":sheet_metal_fe.get_blank_size(filepath),
+            "sheet_size": (1250,2500),
+            "density": float(density),  # in gm/cc,db
+            "c_mf": c_mf,  # cutting factor, db
+            "ns_mf": float(ns_mf),  # no of start factor, db
+            "rm_rate": rm_rate,  # rate card, db
+            "fright_percent": float(fright_percent)/100.0,  # db
+            "rejection_percent": float(rejection_percent)/100.0, # db
+            "mf_bend": mf_bend,  # db
+            "thk": thk,  # user input
+            "nos": nos,  # qty , user input
+            "no_of_bend" : no_of_bend,   # user input
+            "sub_process":sub_process ,  # user input
+            "surface_finish": surface_finish,  # user input
+            "color": color,  # user input
+            "pp_rate" :pp_rate # rate per squre inch, db
+        }
+            # html_parse = sheet_metal_fe.get_html(filepath)
+            # plt.figure()
+            # plt.axis('equal')
+            # html_parse.plot(autozoom=True)
+            # st.pyplot(plt)
+            # print(html_parse)
+            a = sheet_metal_bc.Sheetmetal_buildCosting_cal().sheet_maetal_cost(cal_data)
+            os.remove(filepath)
+            st.write(a)
+        except:
+            st.warning("The file format is not Proper.")
+            os.remove(filepath)
 
 
