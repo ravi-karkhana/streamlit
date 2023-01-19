@@ -93,18 +93,18 @@ with tab2:
         fright_percent = st.slider("fright Percentage in %",0,40,10,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
     with c2:
-        c_mf = st.number_input("cutting factor",0.012,label_visibility=st.session_state.visibility,
+        c_mf = st.number_input("cutting factor",0.0,100.0,0.012,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
-        mf_bend = st.number_input("Bend Factor",10,label_visibility=st.session_state.visibility,
+        mf_bend = st.number_input("Bend Factor",0,100,10,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
     with c3:
-        density = st.number_input("Density in gm/cc",8.0,label_visibility=st.session_state.visibility,
+        density = st.number_input("Density in gm/cc",0.0,50.0,8.0,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
     with c4:
-        pp_rate = st.number_input("Post Process rate (INR./sqr Inch.)",0.014,label_visibility=st.session_state.visibility,
+        pp_rate = st.number_input("Post Process rate (INR./sqr Inch.)",0.0,100.0,0.014,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
     with c5:
-        ns_mf = st.number_input("no of start factor",1.0,label_visibility=st.session_state.visibility,
+        ns_mf = st.number_input("no of start factor",0.0,50.0,1.0,label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,)
 
     with st.form(key='sheet metal file'):
@@ -118,13 +118,13 @@ with tab2:
         with c2:
             surface_finish = st.selectbox("Surface finish",(None,"Buffing - Matte", "Buffing - Glossy", "Powder Coating", "Zinc Plating", "Anodising"))  
         with c3:
-            thk = st.number_input("sheet thickenss in mm",2) 
+            thk = st.number_input("sheet thickenss in mm",0.5,25.0,2.0) 
         with c4:
             nos = st.number_input("Quantity",1)
             color = st.text_input("Color")
         with c5:
             no_of_bend = st.number_input("No of Bend",0)
-            rm_rate = st.number_input("Raw matreial Rate in INR/Kg.",125)
+            rm_rate = st.number_input("Raw matreial Rate in INR/Kg.",0.0,1000.0,125.0)
 
         
         submitButton = st.form_submit_button(label = 'Calculate')
