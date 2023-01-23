@@ -88,24 +88,18 @@ with tab2:
 
     c1, c2, c3, c4,c5 = st.columns(5)
     with c1:
-        rejection_percent = st.slider("Rejection Percentage in %",0,10,3,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
-        fright_percent = st.slider("fright Percentage in %",0,40,10,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+        rejection_percent = st.slider("Rejection Percentage in %",0,10,3,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
+        fright_percent = st.slider("fright Percentage in %",0,40,10,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c2:
-        c_mf = st.number_input("cutting factor",0.0,100.0,0.012,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
-        mf_bend = st.number_input("Bend Factor",0,100,10,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+        c_mf = st.number_input("cutting factor",0.000,100.000,0.012,step=1e-3,format="%.3f",label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
+        mf_bend = st.number_input("Bend Factor",0.0,100.0,10.0,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c3:
-        density = st.number_input("Density in gm/cc",0.0,50.0,8.0,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+        density = st.number_input("Density in gm/cc",0.0,50.0,8.0,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c4:
-        pp_rate = st.number_input("Post Process rate (INR./sqr Inch.)",0.0,100.0,0.014,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+        pp_rate = st.number_input("Post Process rate (INR./sqr Inch.)",0.000,100.000,0.014,step=1e-3,
+        format="%.3f",label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c5:
-        ns_mf = st.number_input("no of start factor",0.0,50.0,1.0,label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,)
+        ns_mf = st.number_input("no of start factor",0.0,50.0,1.0,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
 
     with st.form(key='sheet metal file'):
 
