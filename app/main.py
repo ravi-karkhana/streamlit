@@ -9,6 +9,7 @@ import numpy as np
 from pathlib import Path
 import datetime
 from mysql_query import *
+from pytz import timezone
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
@@ -156,7 +157,7 @@ with tab2:
             
             a = sheet_metal_bc.Sheetmetal_buildCosting_cal().sheet_maetal_cost(cal_data)
             a["name"] = dxf_file.name
-            a["creation"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            a["creation"] = datetime.datetime.now(timezone("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M:%S')
             os.remove(filepath)
             st.write(a)
             query = upload_query(a)
