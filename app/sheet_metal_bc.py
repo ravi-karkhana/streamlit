@@ -160,7 +160,7 @@ class Sheetmetal_buildCosting_cal:
         sheet_data["blank_size"] = blank_size
         sheet_data["nest_blank_size"] = sheet_nest_data[2]
         sheet_data["no_of_sheet"] = sheet_nest_data[0]
-        # sheet_data["sheet_nest_data"] = sheet_nest_data
+        sheet_data["sheet_thickness"] = data["thk"]
         sheet_data["area"] = area
         sheet_data["volume"] = volum
         sheet_data["wt"] = wt
