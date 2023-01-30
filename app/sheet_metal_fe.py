@@ -7,14 +7,14 @@ def get_dxf_perimeter(path) :
     msp = dwg.modelspace()
     longitud_total = 0
     for e in msp:
-        if e.dxftype() == 'LINE' and e.dxf.linetype== 'Continuous':
+        if e.dxftype() == 'LINE' and e.dxf.linetype in ['Continuous','ByLayer']:
             dl = math.sqrt((e.dxf.start[0]-e.dxf.end[0])**2 + (e.dxf.start[1]- 
             e.dxf.end[1])**2)
             longitud_total = longitud_total + dl
-        elif e.dxftype() == 'CIRCLE' and e.dxf.linetype== 'Continuous':
+        elif e.dxftype() == 'CIRCLE' and e.dxf.linetype in ['Continuous','ByLayer']:
             dc = 2*math.pi*e.dxf.radius
             longitud_total = longitud_total + dc
-        elif e.dxftype() == 'ARC' and e.dxf.linetype== 'Continuous':
+        elif e.dxftype() == 'ARC' and e.dxf.linetype in ['Continuous','ByLayer']:
             angle = abs(e.dxf.start_angle -e.dxf.end_angle)
             arc_perimeter = 2*math.pi*e.dxf.radius*angle/360        
             longitud_total = longitud_total + arc_perimeter
@@ -51,13 +51,13 @@ def get_no_of_start(path):
     loop_count=0
     data={}
     for e in msp:
-        if e.dxf.linetype == 'Continuous'and e.dxftype() == 'CIRCLE':
+        if e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'CIRCLE':
             loop_count+=1
-        elif e.dxf.linetype == 'Continuous'and e.dxftype() == 'ARC':
+        elif e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'ARC':
             start = round(e.dxf.center[0]+e.dxf.radius*math.cos(e.dxf.start_angle*math.pi/180),2),round(e.dxf.center[1]+e.dxf.radius*math.sin(e.dxf.start_angle*math.pi/180),2)
             end = round(e.dxf.center[0]+e.dxf.radius*math.cos(e.dxf.end_angle*math.pi/180),2),round(e.dxf.center[1]+e.dxf.radius*math.sin(e.dxf.end_angle*math.pi/180),2)
             data[str(e)]= start,end,e.dxftype()
-        elif e.dxf.linetype == 'Continuous'and e.dxftype() == 'LINE':
+        elif e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'LINE':
             start = round(e.dxf.start[0]),round(e.dxf.start[1])
             end = round(e.dxf.end[0]),round(e.dxf.end[1])
             data[str(e)]= start,end,e.dxftype()
@@ -113,17 +113,17 @@ def get_blank_size(path):
         return x_vertex,y_vertex
     
     for e in msp:
-        if e.dxf.linetype == 'Continuous'and e.dxftype() == 'CIRCLE':
+        if e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'CIRCLE':
             angle = 360/step_circle
             for step_len in range(step_circle-1):
                 vertex = list(step_vertex(e,angle,step_len))
                 dxf_vertex_points.append(vertex)
-        elif e.dxf.linetype == 'Continuous'and e.dxftype() == 'ARC':
+        elif e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'ARC':
             angle =abs(e.dxf.start_angle - e.dxf.end_angle)/ step_arc 
             for step_len in range(step_arc-1):
                 vertex = step_vertex(e,angle,step_len)
                 dxf_vertex_points.append(list(vertex))  
-        elif e.dxf.linetype == 'Continuous'and e.dxftype() == 'LINE':
+        elif e.dxf.linetype in ['Continuous','ByLayer'] and e.dxftype() == 'LINE':
             start = round(e.dxf.start[0]),round(e.dxf.start[1])
             end = round(e.dxf.end[0]),round(e.dxf.end[1])
             dxf_vertex_points.append(list(start))
