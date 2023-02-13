@@ -20,9 +20,12 @@ with tab1:
         c1, c2 = st.columns(2)
         with c1:
             volume = st.number_input("Part Volume in mm^3",0)
+            rm_rate = st.number_input("Raw matreial Rate in INR/Kg.",0.0,1000.0,125.0)
             qty = st.number_input("Total Quantity",1)
             uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
         with c2:
+            ref_wt = st.number_input("thrusold weight for raw material (in Kg)",0.000,100.000,0.500,step=1e-3,format="%.3f")
+            density = st.number_input("Density in gm/cc",0.0,50.0,8.0)
             surface_area = st.number_input("Surface Area in mm^2",0)
             pdf_file = st.file_uploader("Choose a Solidwork Mass Property File", type=["pdf"])
 
@@ -48,6 +51,8 @@ with tab1:
 
         mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
         final_feat_list = fe_fun.feature_list_for_ml(fe_fun.ref_feat,output)
+        part_wt = fe_fun.get_raw_material_wt(lbh_data,density,ref_wt,qty)
+        stock_material_cost = fe_fun.get_rm_cost(part_wt,rm_rate)
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Length"] = length
         final_feat_list[uploaded_file.name.split(".")[0]]["Width"] = width
@@ -69,7 +74,7 @@ with tab1:
         machine_cost = pickled_gs_cv_rndm_model.predict(test_data)
         setup_cost = pickled_gs_cv_rndm_setup_cost_model.predict(test_data)
         total_Mfg_cost_per_part = machine_cost + setup_cost/qty
-        st.write(total_Mfg_cost_per_part,df)
+        st.write(stock_material_cost,total_Mfg_cost_per_part,df)
 
     # st.snow()
 

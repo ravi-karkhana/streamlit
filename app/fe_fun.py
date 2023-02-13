@@ -80,3 +80,15 @@ def feature_list_for_ml(ref_feat,extract_cad_feat):
 def get_machined_vol(l,b,h,vol):
     machine_vol = float(l)*float(b)*float(h) - float(vol)
     return machine_vol
+
+def get_raw_material_wt(dim,density,referance_wt,qty):
+    vol = float(dim["Length"]) * float(dim["Width"]) * float(dim["Height"])
+    wt = vol * density * (qty/1000000)
+    if wt > referance_wt:
+        return float(wt/qty)
+    else:
+        return float(referance_wt /qty)
+
+def get_rm_cost(wt,rate):
+    rm_cost = wt * rate
+    return rm_cost
