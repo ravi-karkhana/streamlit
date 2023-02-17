@@ -98,7 +98,11 @@ def get_no_of_start(path):
                     break
                 loop_entity.append(var_ent[0])
             loop_count+=1
-    return loop_count
+
+    if loop_count == 0:
+        return loop_count + 1
+    else:
+        return loop_count
 
 def get_blank_size(path):
     dwg = ezdxf.readfile(path)
@@ -133,13 +137,19 @@ def get_blank_size(path):
     
     for idx, line in enumerate(msp.query('LWPOLYLINE')):
         vertex_points = np.asarray(line)
-        dxf_vertex_points = np.concatenate([dxf_vertex_points, vertex_points[:,0:2]])
+        try:
+            dxf_vertex_points = np.concatenate([dxf_vertex_points, vertex_points[:,0:2]])
+        except:
+            dxf_vertex_points = np.concatenate([vertex_points[:,0:2]])
         
     for indx,x in enumerate(msp.query('SPLINE')):
         s_point = x.control_points
         vertex_points = np.asarray(s_point)
 #         print(vertex_points[:2].shape)
-        dxf_vertex_points = np.concatenate([dxf_vertex_points, vertex_points[:,0:2]])
+        try:
+            dxf_vertex_points = np.concatenate([dxf_vertex_points, vertex_points[:,0:2]])
+        except:
+            dxf_vertex_points = np.concatenate([vertex_points[:,0:2]])
         
     vertices_data = np.array(dxf_vertex_points)
     x_min=np.amin(vertices_data[:,0])
