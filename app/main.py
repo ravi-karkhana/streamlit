@@ -104,8 +104,8 @@ with tab2:
     with c3:
         density = st.number_input("Density in gm/cc",0.0,50.0,8.0,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c4:
-        pp_rate = st.number_input("Post Process rate (INR./sqr Inch.)",0.000,100.000,0.014,step=1e-3,
-        format="%.3f",label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
+        pp_rate = st.number_input("Post Process rate (INR/Kg)",0.00,200.00,30.00,step=1e-2,
+        format="%.2f",label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
     with c5:
         ns_mf = st.number_input("no of start factor",0.0,50.0,1.0,label_visibility=st.session_state.visibility,disabled=st.session_state.disabled)
 

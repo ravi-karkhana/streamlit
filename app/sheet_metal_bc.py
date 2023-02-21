@@ -85,8 +85,9 @@ class Sheetmetal_buildCosting_cal:
     def get_area(self, blank_size):
         area = blank_size[0] * blank_size[1]
         return area
-    def get_post_process_cost(self, area, pp_rate):
-        post_process_cost = (area * pp_rate * 2)/645.16
+    def get_post_process_cost(self, area,thickness,density, pp_rate):
+        # post_process_cost = (area * pp_rate * 2)/645.16
+        post_process_cost = (area * thickness * density * pp_rate)/1000000
         return post_process_cost
     def get_bending_cost(self,mf_bend,no_of_bends):
         bend_cost = float(no_of_bends) * float(mf_bend)
@@ -118,7 +119,7 @@ class Sheetmetal_buildCosting_cal:
         if data["sub_process"] == "Laser Cutting":
             if data["surface_finish"] in ["Buffing - Matte", "Buffing - Glossy", "Powder Coating", "Zinc Plating", "Anodising"]:
                 post_processing_cost = self.get_post_process_cost(
-                    area, data["pp_rate"])
+                    area,data["thk"], data["density"], data["pp_rate"])
                 total_cost_per_part = rm_cutting_cost + \
                     rm_fright_cost + rejection_cost + post_processing_cost
                 total_cost = total_cost_per_part * nos
@@ -136,7 +137,7 @@ class Sheetmetal_buildCosting_cal:
                 bending_cost = self.get_bending_cost(
                     data["mf_bend"], data["no_of_bend"])
                 post_processing_cost = self.get_post_process_cost(
-                    area, data["pp_rate"])
+                    area, data["thk"], data["density"], data["pp_rate"])
                 total_cost_per_part = rm_cutting_cost + rm_fright_cost + \
                     rejection_cost + bending_cost + post_processing_cost
                 total_cost = total_cost_per_part * nos
