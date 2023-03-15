@@ -9,6 +9,7 @@ import numpy as np
 from pathlib import Path
 import datetime
 from mysql_query import *
+from util import *
 from pytz import timezone
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
@@ -19,14 +20,14 @@ with tab1:
     with st.form(key='columns_in_form'):
         c1, c2 = st.columns(2)
         with c1:
-            volume = st.number_input("Part Volume in mm^3",0)
+            # volume = st.number_input("Part Volume in mm^3",0)
             rm_rate = st.number_input("Raw matreial Rate in INR/Kg.",0.0,1000.0,125.0)
             qty = st.number_input("Total Quantity",1)
             uploaded_file = st.file_uploader("Choose a Cad Feture File", type=["clt"])
         with c2:
-            ref_wt = st.number_input("thrusold weight for raw material (in Kg)",0.000,100.000,0.500,step=1e-3,format="%.3f")
-            density = st.number_input("Density in gm/cc",0.0,50.0,8.0)
-            surface_area = st.number_input("Surface Area in mm^2",0)
+            # ref_wt = st.number_input("thrusold weight for raw material (in Kg)",0.000,100.000,0.500,step=1e-3,format="%.3f")
+            Matrl_grd = st.selectbox("Select Material Grade ",material_grade)
+            # surface_area = st.number_input("Surface Area in mm^2",0)
             pdf_file = st.file_uploader("Choose a Solidwork Mass Property File", type=["pdf"])
 
         # cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
@@ -39,52 +40,51 @@ with tab1:
     pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(setupcost_model_file, 'rb'))
     
 
-    # x1 = [[0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,120,20,40,55000,45000,41000]]
-
     if uploaded_file is not None:
         output = fe_fun.feture_extration_fun(uploaded_file)
         lbh_data = fe_fun.get_lbh_from_file(uploaded_file)
         length = lbh_data["Length"]
         width = lbh_data["Width"]
         height = lbh_data["Height"]
-        # print(os.getcwd()+"\\"+"gs_cv_rndm.pkl")
 
-        mchn_vol = fe_fun.get_machined_vol(length,width,height,volume)
-        final_feat_list = fe_fun.feature_list_for_ml(fe_fun.ref_feat,output)
-        part_wt = fe_fun.get_raw_material_wt(lbh_data,density,ref_wt,qty)
-        stock_material_cost = fe_fun.get_rm_cost(part_wt,rm_rate)
+        final_feat_list = fe_fun.feature_list_for_ml(ref_feat,output)
+        part_wt = fe_fun.get_raw_material_wt(lbh_data,material_density[Matrl_grd])
+        stock_material_cost = fe_fun.get_rm_cost(part_wt,rm_rate,qty)
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Length"] = length
         final_feat_list[uploaded_file.name.split(".")[0]]["Width"] = width
         final_feat_list[uploaded_file.name.split(".")[0]]["Height"] = height
 
-        if pdf_file is None:
-            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = surface_area
-            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = volume
-        else:
-            basic_prop = fe_fun.get_besic_prop(pdf_file)
-            final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = basic_prop["Surface area"]
-            final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = basic_prop["Volume"]
+        basic_prop = fe_fun.get_besic_prop(pdf_file)
+        final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = basic_prop["Surface area"]
+        final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = basic_prop["Volume"]
+        mchn_vol = fe_fun.get_machined_vol(length,width,height,basic_prop["Volume"])
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Machined volume"] = mchn_vol
+        matrl_grp = fe_fun.get_value_of_group(Matrl_grd,garde_group,group_name)
+        ml_data = fe_fun.get_df_with_grade(final_feat_list[uploaded_file.name.split(".")[0]],matrl_grp)
     
         df = pd.DataFrame(final_feat_list)
-        test_data = df.values
-        test_data = [list(np.concatenate(test_data))]
-        machine_cost = pickled_gs_cv_rndm_model.predict(test_data)
-        setup_cost = pickled_gs_cv_rndm_setup_cost_model.predict(test_data)
+        test_data = [list(np.concatenate(df.values))]
+        machine_cost = np.round(pickled_gs_cv_rndm_model.predict(test_data))
+        setup_cost = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(test_data))
         total_Mfg_cost_per_part = machine_cost + setup_cost/qty
-        st.write(stock_material_cost,total_Mfg_cost_per_part,df)
+        post_process_cost = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = 0, cost_sqr_inch = 0)
+
+        #showing Output 
+
+        st.success("ML Run Successfully!!!")
+        c = st.container() 
+        c.write(f"Raw Material cost is : {stock_material_cost} Rs.")
+        c.write(f"Machining cost per part is :  {machine_cost[0]} Rs.")
+        c.write(f"Total Setup cost is : {setup_cost[0]} Rs.")
+        c.write(f"Total Maching cost per part is :  {total_Mfg_cost_per_part[0]} Rs.")
+        c.write(f"Post Process cost per part is : {post_process_cost} Rs.")
+        # st.write(stock_material_cost,total_Mfg_cost_per_part,machine_cost,setup_cost)
+        
+        # st.write(df) 
 
     # st.snow()
-
-    # if cad_file is not None:
-    #     with open(cad_file.name,"wb") as f:
-    #         f.write(cad_file.getvalue())
-    #     filepath = os.getcwd()+cad_file.name
-    #     cad = trimesh.Trimesh(**trimesh.interfaces.gmsh.load_gmsh(file_name=filepath))
-    #     valu =cad.volume
-    #     st.write("done",valu)
 
 with tab2:
 
