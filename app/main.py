@@ -34,8 +34,8 @@ with tab1:
 
         submitButton = st.form_submit_button(label = 'Calculate')
 
-    machine_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm.pkl"
-    setupcost_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_setup_cost.pkl"
+    machine_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_v2.pkl"
+    setupcost_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_setup_cost_v2.pkl"
     pickled_gs_cv_rndm_model = pickle.load(open(machine_model_file, 'rb'))
     pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(setupcost_model_file, 'rb'))
     
@@ -59,6 +59,7 @@ with tab1:
         final_feat_list[uploaded_file.name.split(".")[0]]["Surface area"] = basic_prop["Surface area"]
         final_feat_list[uploaded_file.name.split(".")[0]]["Volume"] = basic_prop["Volume"]
         mchn_vol = fe_fun.get_machined_vol(length,width,height,basic_prop["Volume"])
+        final_feat_list[uploaded_file.name.split(".")[0]]["Stock Volume"] = float(length)*float(height)*float(width)
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Machined volume"] = mchn_vol
         matrl_grp = fe_fun.get_value_of_group(Matrl_grd,garde_group,group_name)
@@ -82,7 +83,7 @@ with tab1:
         c.write(f"Post Process cost per part is : {post_process_cost} Rs.")
         # st.write(stock_material_cost,total_Mfg_cost_per_part,machine_cost,setup_cost)
         
-        # st.write(df) 
+        st.write("here is the input data to ML: ", df) 
 
     # st.snow()
 
