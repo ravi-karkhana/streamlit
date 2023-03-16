@@ -27,7 +27,7 @@ with tab1:
         with c2:
             # ref_wt = st.number_input("thrusold weight for raw material (in Kg)",0.000,100.000,0.500,step=1e-3,format="%.3f")
             Matrl_grd = st.selectbox("Select Material Grade ",material_grade)
-            # surface_area = st.number_input("Surface Area in mm^2",0)
+            pp_name = st.selectbox("Select Post Process ",post_process_list)
             pdf_file = st.file_uploader("Choose a Solidwork Mass Property File", type=["pdf"])
 
         # cad_file = st.file_uploader("Choose a Cad file", type=["step","iges","stp","igs"])
@@ -69,7 +69,7 @@ with tab1:
         machine_cost = np.round(pickled_gs_cv_rndm_model.predict(test_data))
         setup_cost = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(test_data))
         total_Mfg_cost_per_part = machine_cost + setup_cost/qty
-        post_process_cost = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = 0, cost_sqr_inch = 0)
+        post_process_cost = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = post_process_rate['Cost per Kg'][pp_name], cost_sqr_inch = post_process_rate['Cost per sq inch'][pp_name])
 
         #showing Output 
 
