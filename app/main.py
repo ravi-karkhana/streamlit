@@ -35,7 +35,7 @@ with tab1:
         submitButton = st.form_submit_button(label = 'Calculate')
 
     machine_model_file = Path(__file__).parents[0] / "ml_model/random_best_model_v4.pkl"
-    setupcost_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_setup_cost_v6.pkl"
+    setupcost_model_file = Path(__file__).parents[0] / "ml_model/random_best_model_setup_cost_v6.pkl"
     pickled_gs_cv_rndm_model = pickle.load(open(machine_model_file, 'rb'))
     pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(setupcost_model_file, 'rb'))
     
