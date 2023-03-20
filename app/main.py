@@ -50,7 +50,8 @@ with tab1:
         final_feat_list = fe_fun.feature_list_for_ml(ref_feat,output)
         # df_for_setup_cost = fe_fun.feature_list_for_ml(ref_feat,output)
         part_wt = fe_fun.get_raw_material_wt(lbh_data,material_density[Matrl_grd])
-        stock_material_cost = fe_fun.get_rm_cost(part_wt,rm_rate,qty)
+        cost = {}
+        cost["stock_material_cost"] = fe_fun.get_rm_cost(part_wt,rm_rate,qty)
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Length"] = length
         final_feat_list[uploaded_file.name.split(".")[0]]["Width"] = width
@@ -69,27 +70,28 @@ with tab1:
     
         df = pd.DataFrame(final_feat_list)
         test_data = [list(np.concatenate(df.values))]
-        machine_cost = np.round(pickled_gs_cv_rndm_model.predict(test_data))
-        df_for_setup_cost[uploaded_file.name.split(".")[0]]["Machining Cost/Part"] = machine_cost[0]
+        cost["machine_cost"] = np.round(pickled_gs_cv_rndm_model.predict(test_data))[0]
+        df_for_setup_cost[uploaded_file.name.split(".")[0]]["Machining Cost/Part"] = cost["machine_cost"]
         list(map(df_for_setup_cost[uploaded_file.name.split(".")[0]].pop, group_name.keys()))
         # print("_"*50)
         # print(df_for_setup_cost)
         df_setup_input = pd.DataFrame(df_for_setup_cost)
         setup_input = [list(np.concatenate(df_setup_input.values))]
-        setup_cost = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(setup_input))
-        total_Mfg_cost_per_part = machine_cost + setup_cost/qty
-        post_process_cost = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = post_process_rate['Cost per Kg'][pp_name], cost_sqr_inch = post_process_rate['Cost per sq inch'][pp_name])
+        cost["setup_cost"] = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(setup_input))[0]
+        cost["total_Mfg_cost_per_part"] = cost["machine_cost"] + cost["setup_cost"]/qty
+        cost["post_process_cost"] = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = post_process_rate['Cost per Kg'][pp_name], cost_sqr_inch = post_process_rate['Cost per sq inch'][pp_name])
+        cost["total_cost_per_part"] = cost["stock_material_cost"] + cost["total_Mfg_cost_per_part"] + cost["post_process_cost"]
 
         #showing Output 
 
         st.success("ML Run Successfully!!!")
-        c = st.container() 
-        c.write(f"Raw Material cost is : {stock_material_cost} Rs.")
-        c.write(f"Machining cost per part is :  {machine_cost[0]} Rs.")
-        c.write(f"Total Setup cost is : {setup_cost[0]} Rs.")
-        c.write(f"Total Maching cost per part is :  {total_Mfg_cost_per_part[0]} Rs.")
-        c.write(f"Post Process cost per part is : {post_process_cost} Rs.")
-        # st.write(stock_material_cost,total_Mfg_cost_per_part,machine_cost,setup_cost)
+        # c = st.container() 
+        # c.write(f"Raw Material cost per part is : {cost["stock_material_cost"]} Rs.")
+        # c.write(f"Machining cost per part is :  {cost["machine_cost"]} Rs.")
+        # c.write(f"Total Setup cost is : {cost["setup_cost"]} Rs.")
+        # c.write(f"Total Maching cost per part is :  {cost["total_Mfg_cost_per_part"]} Rs.")
+        # c.write(f"Post Process cost per part is : {cost["post_process_cost"]} Rs.")
+        st.write(cost)
         
         st.write("here is the input data to ML: ", df) 
 
