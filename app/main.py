@@ -34,8 +34,8 @@ with tab1:
 
         submitButton = st.form_submit_button(label = 'Calculate')
 
-    machine_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_v2.pkl"
-    setupcost_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_setup_cost_v2.pkl"
+    machine_model_file = Path(__file__).parents[0] / "ml_model/random_best_model_v3.pkl"
+    setupcost_model_file = Path(__file__).parents[0] / "ml_model/gs_cv_rndm_setup_cost_v4.pkl"
     pickled_gs_cv_rndm_model = pickle.load(open(machine_model_file, 'rb'))
     pickled_gs_cv_rndm_setup_cost_model = pickle.load(open(setupcost_model_file, 'rb'))
     
@@ -48,6 +48,7 @@ with tab1:
         height = lbh_data["Height"]
 
         final_feat_list = fe_fun.feature_list_for_ml(ref_feat,output)
+        # df_for_setup_cost = fe_fun.feature_list_for_ml(ref_feat,output)
         part_wt = fe_fun.get_raw_material_wt(lbh_data,material_density[Matrl_grd])
         stock_material_cost = fe_fun.get_rm_cost(part_wt,rm_rate,qty)
 
@@ -62,13 +63,20 @@ with tab1:
         final_feat_list[uploaded_file.name.split(".")[0]]["Stock Volume"] = float(length)*float(height)*float(width)
 
         final_feat_list[uploaded_file.name.split(".")[0]]["Machined volume"] = mchn_vol
+        df_for_setup_cost = final_feat_list.copy()
         matrl_grp = fe_fun.get_value_of_group(Matrl_grd,garde_group,group_name)
         ml_data = fe_fun.get_df_with_grade(final_feat_list[uploaded_file.name.split(".")[0]],matrl_grp)
     
         df = pd.DataFrame(final_feat_list)
         test_data = [list(np.concatenate(df.values))]
         machine_cost = np.round(pickled_gs_cv_rndm_model.predict(test_data))
-        setup_cost = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(test_data))
+        df_for_setup_cost[uploaded_file.name.split(".")[0]]["Machining Cost/Part"] = machine_cost[0]
+        list(map(df_for_setup_cost[uploaded_file.name.split(".")[0]].pop, group_name.keys()))
+        # print("_"*50)
+        # print(df_for_setup_cost)
+        df_setup_input = pd.DataFrame(df_for_setup_cost)
+        setup_input = [list(np.concatenate(df_setup_input.values))]
+        setup_cost = np.round(pickled_gs_cv_rndm_setup_cost_model.predict(setup_input))
         total_Mfg_cost_per_part = machine_cost + setup_cost/qty
         post_process_cost = fe_fun.get_process_cost(basic_prop["Volume"], basic_prop["Surface area"],material_density[Matrl_grd], cost_kg = post_process_rate['Cost per Kg'][pp_name], cost_sqr_inch = post_process_rate['Cost per sq inch'][pp_name])
 
