@@ -26,13 +26,21 @@ def get_lbh_from_file(file_name):
     lbh = {}
     for line in stringio:
         if "BOX/" in line:
-            lbh["Length"] = line.replace(" \n","").split(",")[3]
-            lbh["Width"] = line.replace(" \n","").split(",")[4]
-            lbh["Height"] = line.replace(" \n","").split(",")[-1].replace(" \r\n",'')
+            lbh["Length"] = float(line.replace(" \n","").split(",")[3])
+            lbh["Width"] = float(line.replace(" \n","").split(",")[4])
+            lbh["Height"] = float(line.replace(" \n","").split(",")[-1].replace(" \r\n",''))
         else:
             pass
-
-    return lbh
+    def get_sort_lbh(box_dim):
+        v = list(box_dim.values())
+        v.sort()
+        box_dim["Length"] = max(v)
+        box_dim["Width"] = v[1]
+        box_dim["Height"] = min(v)
+        v = list(box_dim.values())
+        return box_dim
+    
+    return get_sort_lbh(lbh)
 
 # from extracted feature from clt file get the frequncy of all unique feature 
 def get_fequncy_of_fetaure(feature_lst):
