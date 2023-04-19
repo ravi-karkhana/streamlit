@@ -176,10 +176,10 @@ with tab2:
             a["creation"] = datetime.datetime.now(timezone("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M:%S')
             os.remove(filepath)
             st.write(a)
-            query = upload_query(a)
+            # query = upload_query(a)
             # query2 = '''insert into sheetmetaldata (name ,creation ,perimeter ,no_of_start ,blank_size_x ,blank_size_y ,nest_blank_size_x ,nest_blank_size_y ,no_of_sheet ,sheet_thickness ,area ,volume ,wt ,nos ,wt_per_part ,rm_cost ,lasser_cutting_cost ,rm_cutting_cost ,rm_fright_cost ,rejection_cost ,bending_cost ,post_processing_cost ,total_cost_per_part ,total_cost ,optimum_nos ,optimum_rm_cost ,optimum_total_cost_per_part ,optimum_total_cost ) VALUES ("Flat pattern - P-TG1-EXP-0001.DXF", "2023-01-27 15:26:23", 344.82, 3, 90.0, 60.0, 312.5, 312.5, 0, 2.0, 5400.0, 195.312, 1.562, 1, 1.562, 195.25, 11.28, 206.53, 19.53, 6.2, 0, 0, 232.26, 232.26, 15, 13.02, 50.03, 750.45);'''
             # query3 = "select * from sheetmetaldata;"
-            run_query(query)
+            # run_query(query)
         except:
             st.warning("The file format is not Proper.")
             os.remove(filepath)
