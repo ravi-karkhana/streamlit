@@ -33,6 +33,7 @@ class Sheetmetal_buildCosting_cal:
         sheets_size = self.sheet_mesh(sheet_size, mesh_size)
         if data_ == "Cool" and nos == 1:
             for i in range(len(sheets_size)):
+                sheets_size[i].sort()
                 if blank_size[0] <= sheets_size[i][0] and blank_size[1] <= sheets_size[i][1]:
                     optimum_qty = self.check_qty(blank_size, sheets_size[i])
                     return 0, nos, sheets_size[i], 0, optimum_qty
@@ -41,6 +42,7 @@ class Sheetmetal_buildCosting_cal:
             remaining_qty = nos - \
                 self.full_sheet_qty(blank_size, sheet_size)*no_of_sheet
             for i in range(len(sheets_size)):
+                sheets_size[i].sort()
                 cal_nos = self.check_qty(blank_size, sheets_size[i])
                 if cal_nos >= remaining_qty and remaining_qty != 0:
                     optimum_qty = cal_nos + no_of_sheet * \
@@ -51,6 +53,7 @@ class Sheetmetal_buildCosting_cal:
                     return no_of_sheet, nos, [0, 0], remaining_qty, optimum_qty
         elif data_ == "Cool" and self.full_sheet_qty(blank_size, sheet_size) > nos:
             for i in range(len(sheets_size)):
+                sheets_size[i].sort()
                 cal_nos = self.check_qty(blank_size, sheets_size[i])
                 if cal_nos >= nos:
                     optimum_qty = cal_nos
