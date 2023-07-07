@@ -10,11 +10,12 @@ from pathlib import Path
 import datetime
 from mysql_query import *
 from util import *
+from ce_package import *
 from pytz import timezone
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
 
-tab1, tab2 = st.tabs(["CNC","sheet metal"])
+tab1, tab2,tab3 = st.tabs(["CNC","sheet metal","Cad Exchanger ML"])
 
 with tab1:
     with st.form(key='columns_in_form'):
@@ -185,3 +186,56 @@ with tab2:
             os.remove(filepath)
 
 
+with tab3:
+
+    with st.form(key='columns_in_forms'):
+        c1, c2 = st.columns(2)
+        with c1:
+            machn_hr_rate = st.number_input("Machine hour Rate in INR/hr.",0.0,1000.0,375.0)
+            qty = st.number_input("Total Quantity",1)
+            upload_feat_file = st.file_uploader("Upload CAD Exchanger Feature txt file", type=["txt"])
+        with c2:
+            Matrl_grd_ce = st.selectbox("Select Material Grade ",material_grade)
+            pp_name_ce = st.selectbox("Select Post Process ",post_process_list)
+            uploaded_meta_file = st.file_uploader("Upload CAD Exchanger MetaData txt file", type=["txt"])
+
+        submitButton = st.form_submit_button(label = 'Calculate')
+
+
+    machn_time_model_file = Path(__file__).parents[0] / "ml_model/ce_models/s_mchn_time_rndm_forest_model_v1.pkl"
+    df_model_file = Path(__file__).parents[0] / "ml_model/ce_models/df_rf_model_v1.pickle"
+    tool_nos_model_file = Path(__file__).parents[0] / "ml_model/ce_models/no_of_tools_gb_model_V2.pickle"
+    machn_time_model = pickle.load(open(machn_time_model_file, 'rb'))
+    df_model = pickle.load(open(df_model_file, 'rb'))
+    tool_nos_model = pickle.load(open(tool_nos_model_file, 'rb'))
+
+    if upload_feat_file is not None and uploaded_meta_file is not None:
+        try:
+            final_df = DataProcessor(upload_feat_file,uploaded_meta_file,Matrl_grd_ce).process_data()
+            difficulty_factor_df = prepare_difficulty_factor_data(final_df)
+            difficulty_factor = df_model.predict(difficulty_factor_df.values)[0]
+            # st.write(difficulty_factor)
+            if difficulty_factor == 'Simple':
+                mchn_df = final_df.drop(['file_name','Radius'],axis=1)
+                mchn_df = mchn_df.reindex(sorted(mchn_df.columns), axis=1)
+                machine_time = machn_time_model.predict(mchn_df.values)[0]
+                mch_wt = 1.17  # to given weightage to the machining time 
+                machine_time = machine_time * mch_wt
+                nos_tool_df = prepare_nos_tool_data(final_df)
+                # st.write(machine_time)
+                no_of_tool = round(tool_nos_model.predict(nos_tool_df.values)[0],0)
+                st.write(no_of_tool)
+                cost_data = calculate_cost_data(machine_time, machn_hr_rate, no_of_tool, qty, final_df, Matrl_grd_ce, pp_name_ce)
+                cost_df = pd.DataFrame([cost_data])
+                st.success(f"Here is the Quotation for {final_df['file_name'].iloc[0]}!")
+                st.write(cost_df)
+                # for graph qty vs per part cost
+                get_graph_qty_vs_per_part_cost(machine_time, machn_hr_rate, no_of_tool, final_df, Matrl_grd_ce, pp_name_ce,cost_df)
+                st.info(f"Here are Features Extracted from {final_df['file_name'].iloc[0]}!")
+                st.dataframe(final_df)
+            else:
+                display_warning(difficulty_factor)
+        except:
+            display_warning_file()
+    # else:
+    #     display_warning_file()
