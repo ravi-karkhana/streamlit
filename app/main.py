@@ -213,7 +213,7 @@ with tab3:
     operation_model = pickle.load(open(operation_model_file, 'rb'))
 
     if upload_feat_file is not None and uploaded_meta_file is not None:
-        try:
+        # try:
             final_df = DataProcessor(upload_feat_file,uploaded_meta_file,Matrl_grd_ce).process_data()
             operations = get_operation_prediction(operation_model, final_df)
             difficulty_factor_df = prepare_difficulty_factor_data(final_df)
@@ -246,7 +246,7 @@ with tab3:
                 st.dataframe(final_df)
             else:
                 display_warning(difficulty_factor)
-        except:
-            display_warning_file()
+        # except:
+        #     display_warning_file()
     # else:
     #     display_warning_file()
