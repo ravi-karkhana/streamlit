@@ -10,6 +10,35 @@ from util import *
 # Ignore all warnings
 warnings.filterwarnings("ignore")
 
+# operation prediction model
+def get_operation_prediction(model, df):
+    feat = ['Blind Hole(s)', 'Circular Milled Face(s)',
+            'Concave Fillet Edge Milling Face(s)',
+            'Convex Profile Edge Milling Face(s)', 'Countersink(s)',
+            'Curved Milled Face(s)', 'Flat Bottom Hole(s)',
+            'Flat Face Milled Face(s)', 'Flat Side Milled Face(s)', 'Pocket(s)',
+            'Through Hole(s)', 'Total features', 'No of axis']
+
+    operations_key = ['Boring', 'Centre Drill', 'Chamfering',
+                      'Chamfering Interpolation', 'Counterboring',
+                      'Counterboring Interpolation', 'Countersinking', 'Drilling', 'Facing',
+                      'High Feed Milling', 'Internal Threading', 'Parting', 'Pocket Milling',
+                      'Profile Milling', 'Profile Milling -  Finishing', 'Radial Chamfering',
+                      'Shoulder Milling', 'Shoulder/Slot/Pocket Milling - Finishing',
+                      'Side Slotting', 'Slot Milling', 'Tapping']
+
+    operations_val = model.predict(df[feat].values)[0]
+    operations = dict(zip(operations_key, operations_val))
+    # Create a DataFrame from the dictionary
+    df = pd.DataFrame.from_dict(operations, orient='index', columns=['Value'])
+
+    # Convert the 'Value' column to numeric
+    df['Value'] = pd.to_numeric(df['Value'])
+
+    # Select rows where the 'Value' is 1
+    selected_rows = df[df['Value'] == 1]
+
+    return selected_rows
 # Data Process for both file package
 class DataProcessor:
     def __init__(self, feat_file_path, meta_file_path,mtrl_val):
@@ -197,6 +226,9 @@ class ExtractFeatureToDF:
     def get_prep_fst_half_feat_ML(self):
 
         df = ExtractFeatureToDF.get_full_feat_lst(self)
+        # Group by 'file_name', extract distinct axis names, and count the number of distinct axes
+        axis_df = df.groupby(['file_name'])['axis'].apply(lambda x: x.dropna().nunique()).reset_index()
+        axis_df.rename(columns={'axis': 'No of axis'}, inplace=True)
         df_grp_radius = df.groupby(['file_name'])['Radius'].nunique().reset_index()
         df_grp_nos = df.groupby(['file_name','Feature Name'])['Nos.'].sum().reset_index()
 
@@ -213,8 +245,8 @@ class ExtractFeatureToDF:
         df_grp_nos_vol_piv = pd.merge(df_grp_nos_piv,df_grp_vol_piv,on='file_name', how='left')
 
         df_grp_nos_vol_piv = pd.merge(df_grp_nos_vol_piv,df_grp_radius,on='file_name', how='left')
+        df_grp_nos_vol_piv = pd.merge(df_grp_nos_vol_piv, axis_df, on='file_name', how='outer')
 
-        
         return df_grp_nos_vol_piv.fillna(0)
     
 

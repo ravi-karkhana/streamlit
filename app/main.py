@@ -11,6 +11,7 @@ import datetime
 from mysql_query import *
 from util import *
 from ce_package import *
+from Supplier_search_algo import *
 from pytz import timezone
 
 st.set_page_config(page_title="File Uploader", page_icon=":clipboard:", layout="wide")
@@ -203,20 +204,23 @@ with tab3:
 
 
     machn_time_model_file = Path(__file__).parents[0] / "ml_model/ce_models/s_mchn_time_rndm_forest_model_v1.pkl"
+    operation_model_file = Path(__file__).parents[0] / "ml_model/ce_models/operation_class_rndm_forest_model_v1.pkl"
     df_model_file = Path(__file__).parents[0] / "ml_model/ce_models/df_rf_model_v1.pickle"
     tool_nos_model_file = Path(__file__).parents[0] / "ml_model/ce_models/no_of_tools_gb_model_V2.pickle"
     machn_time_model = pickle.load(open(machn_time_model_file, 'rb'))
     df_model = pickle.load(open(df_model_file, 'rb'))
     tool_nos_model = pickle.load(open(tool_nos_model_file, 'rb'))
+    operation_model = pickle.load(open(operation_model_file, 'rb'))
 
     if upload_feat_file is not None and uploaded_meta_file is not None:
         try:
             final_df = DataProcessor(upload_feat_file,uploaded_meta_file,Matrl_grd_ce).process_data()
+            operations = get_operation_prediction(operation_model, final_df)
             difficulty_factor_df = prepare_difficulty_factor_data(final_df)
             difficulty_factor = df_model.predict(difficulty_factor_df.values)[0]
             # st.write(difficulty_factor)
             if difficulty_factor == 'Simple':
-                mchn_df = final_df.drop(['file_name','Radius'],axis=1)
+                mchn_df = final_df.drop(['file_name','Radius','No of axis'],axis=1)
                 mchn_df = mchn_df.reindex(sorted(mchn_df.columns), axis=1)
                 machine_time = machn_time_model.predict(mchn_df.values)[0]
                 mch_wt = 1.17  # to given weightage to the machining time 
@@ -227,11 +231,18 @@ with tab3:
                 st.write(no_of_tool)
                 cost_data = calculate_cost_data(machine_time, machn_hr_rate, no_of_tool, qty, final_df, Matrl_grd_ce, pp_name_ce)
                 cost_df = pd.DataFrame([cost_data])
-                st.success(f"Here is the Quotation for {final_df['file_name'].iloc[0]}!")
+                st.info(f"Here are List of possible machine operation for '{final_df['file_name'].iloc[0]}' CAD File !")
+                st.dataframe([operations.index])
+                st.success(f"Here is the Quotation for '{final_df['file_name'].iloc[0]}' CAD with {Matrl_grd_ce} Material grade!")
                 st.write(cost_df)
                 # for graph qty vs per part cost
                 get_graph_qty_vs_per_part_cost(machine_time, machn_hr_rate, no_of_tool, final_df, Matrl_grd_ce, pp_name_ce,cost_df)
-                st.info(f"Here are Features Extracted from {final_df['file_name'].iloc[0]}!")
+                supp_db , machn_db = get_machines_supplier_data(final_df)
+                st.info(f"Here is a list of {len(supp_db)} suppliers that are capable of manufacturing the '{final_df['file_name'].iloc[0]}' part: ")
+                st.dataframe(supp_db)
+                st.info(f"Here is a list of {len(machn_db)} Machine that are capable of manufacturing the '{final_df['file_name'].iloc[0]}' part: ")
+                st.dataframe(machn_db)
+                st.info(f"Here are Features Extracted from '{final_df['file_name'].iloc[0]}' !")
                 st.dataframe(final_df)
             else:
                 display_warning(difficulty_factor)
