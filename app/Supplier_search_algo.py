@@ -9,7 +9,8 @@ def get_machines_supplier_data(df):
     height = df['Height'][0]
     process = 'CNC Machining'
 
-    supp_db = pd.read_csv(Path(__file__).parents[0] / "supplier_db/supplier_machn_cap.csv")
+    # supp_db = pd.read_csv(Path(__file__).parents[0] / "supplier_db/supplier_machn_cap.csv")
+    supp_db = pd.read_json(Path(__file__).parents[0] / "supplier_db/supplier_machn_cap.json")
     filtered_df = supp_db[
         (supp_db['manufacturing_sub_process'] == process) &
         (supp_db['Bed Size - X in mm'] > length) &
