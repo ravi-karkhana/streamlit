@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 import streamlit as st
 import mysql.connector
-from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 import warnings
 
 def get_machines_supplier_data(df):
